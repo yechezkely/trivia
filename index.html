@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>משחק טריוויה: שירים עבריים</title>
+    <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    <style>
+      .game-container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+        font-family: Arial, sans-serif;
+        text-align: center;
+      }
+      .answers-container {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      .answer-button {
+        padding: 10px;
+        font-size: 16px;
+        cursor: pointer;
+        background-color: #f0f0f0;
+        border: none;
+        border-radius: 5px;
+      }
+      .answer-button:hover:not(:disabled) {
+        background-color: #e0e0e0;
+      }
+      .answer-button:disabled {
+        cursor: not-allowed;
+      }
+      .correct {
+        background-color: #4caf50 !important;
+        color: white;
+      }
+      .incorrect {
+        background-color: #f44336 !important;
+        color: white;
+      }
+      .result-container {
+        margin-top: 20px;
+      }
+      button {
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+        background-color: #2196f3;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        margin-top: 10px;
+      }
+      button:hover {
+        background-color: #1976d2;
+      }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const questions = [
+        {
+          question: "מי שר את השיר 'הלוואי'?",
+          answers: ["בועז שרעבי", "אריק איינשטיין", "שלמה ארצי", "עידן רייכל"],
+          correctAnswer: 2
+        },
+        {
+          question: "מי כתב את המילים לשיר 'ירושלים של זהב'?",
+          answers: ["חיים חפר", "נעמי שמר", "אהוד מנור", "יורם טהרלב"],
+          correctAnswer: 1
+        },
+        {
+          question: "איזה שיר אינו של להקת כוורת?",
+          answers: ["יו יה", "גוליית", "ברוש", "נתתי לה חיי"],
+          correctAnswer: 2
+        },
+        {
+          question: "מי שר את השיר 'מי אוהב אותך יותר ממני'?",
+          answers: ["שלמה ארצי", "אייל גולן", "עומר אדם", "משה פרץ"],
+          correctAnswer: 0
+        },
+        {
+          question: "איזה שיר אינו של אביב גפן?",
+          answers: ["אבא", "לבכות לך", "יש לי סיכוי", "אור גנוז"],
+          correctAnswer: 3
+        },
+      ];
+
+      const TriviaGame = () => {
+        const [currentQuestion, setCurrentQuestion] = React.useState(0);
+        const [selectedAnswer, setSelectedAnswer] = React.useState(null);
+        const [showResult, setShowResult] = React.useState(false);
+        const [score, setScore] = React.useState(0);
+
+        const handleAnswer = (index) => {
+          setSelectedAnswer(index);
+          setShowResult(true);
+          if (index === questions[currentQuestion].correctAnswer) {
+            setScore(score + 1);
+          }
+        };
+
+        const nextQuestion = () => {
+          setSelectedAnswer(null);
+          setShowResult(false);
+          setCurrentQuestion(currentQuestion + 1);
+        };
+
+        if (currentQuestion >= questions.length) {
+          return (
+            <div className="game-container">
+              <h2>המשחק הסתיים!</h2>
+              <p>הציון הסופי שלך: {score} מתוך {questions.length}</p>
+              <button onClick={() => window.location.reload()}>שחק שוב</button>
+            </div>
+          );
+        }
+
+        return (
+          <div className="game-container">
+            <h2>שאלה {currentQuestion + 1} מתוך {questions.length}</h2>
+            <p>{questions[currentQuestion].question}</p>
+            <div className="answers-container">
+              {questions[currentQuestion].answers.map((answer, index) => (
+                <button
+                  key={index}
+                  onClick={() => !showResult && handleAnswer(index)}
+                  disabled={showResult}
+                  className={`answer-button ${
+                    showResult
+                      ? index === questions[currentQuestion].correctAnswer
+                        ? 'correct'
+                        : index === selectedAnswer
+                        ? 'incorrect'
+                        : ''
+                      : ''
+                  }`}
+                >
+                  {answer}
+                </button>
+              ))}
+            </div>
+            {showResult && (
+              <div className="result-container">
+                <p>
+                  {selectedAnswer === questions[currentQuestion].correctAnswer
+                    ? 'תשובה נכונה!'
+                    : 'תשובה שגויה.'}
+                </p>
+                <p>
+                  התשובה הנכונה היא: {questions[currentQuestion].answers[questions[currentQuestion].correctAnswer]}
+                </p>
+                <button onClick={nextQuestion}>
+                  {currentQuestion < questions.length - 1 ? 'לשאלה הבאה' : 'סיים משחק'}
+                </button>
+              </div>
+            )}
+          </div>
+        );
+      };
+
+      ReactDOM.render(<TriviaGame />, document.getElementById('root'));
+    </script>
+</body>
+</html>
